@@ -48,8 +48,10 @@ module NicoPodcast
 
     def prepare_items
       @items.each{ |item|
-        puts item.title
-        item.prepare
+        begin
+          puts item.title
+          item.prepare
+        end
       }
       return
     end
@@ -75,10 +77,11 @@ module NicoPodcast
     end
 
     def has_enclosure?
+      File.exist?(self.path('mp3')) and File.exist?(self.path('mp4'))
     end
 
     def download
-      puts 'download'
+      puts "download #{@video.info.size_high / 1024}kb"
       NicoPodcast.prepare_directory
       File.open(self.path, "wb") {|f|
         f.write @video.video
@@ -86,11 +89,13 @@ module NicoPodcast
     end
 
     def encode
-      puts 'encode'
-      puts "ffmpeg -i #{self.path} -acodec copy #{self.path('mp3')}"
+      puts 'encode mp3'
+      system "ffmpeg -i #{self.path} -acodec libmp3lame -ab 128k #{self.path('mp3')} > /dev/null" unless File.exist?(self.path('mp3'))
+      puts 'encode mp4'
+      system "ffmpeg -i #{self.path} -f mp4 -acodec libfaac -async 4800 -dts_delta_threshold 1 -vcodec libx264 -qscale 7 #{self.path('mp4')} > /dev/null" unless File.exist?(self.path('mp4'))
     end
 
-    def path(type = nil)
+    def path(type = @video.type)
       suffix = type ? ".#{type}" : ''
       File.join(NicoPodcast.file_path, @video.video_id + suffix)
     end
@@ -100,7 +105,7 @@ module NicoPodcast
     end
 
     def inspect
-      "\#<Video:#{@video.video_id}>"
+      "\#<Video:#{@video.video_id} #{@video.title}>"
     end
   end
 
@@ -117,7 +122,7 @@ end
 # ----------------------
 
 podcast = NicoPodcast::Podcast.new(nil)
-podcast.items = NicoPodcast.agent.search('NHK').videos.map{ |vp|
+podcast.items = NicoPodcast.agent.search('capsule').videos[0..0].map{ |vp|
   NicoPodcast::Video.new(vp)
 }
 pp podcast.items
