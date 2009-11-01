@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
+  
+  <channel>
+    <title><%= podcast.title %></title>
+    <link><%= podcast.link %></link>
+    <% if podcast.language %><language><%= podcast.language %></language><% end %>
+    <% if podcast.copyright %><copyright><%= podcast.copyright %></copyright><% end %>
+    <% if podcast.subtitle %><itunes:subtitle><%= podcast.subtitle %></itunes:subtitle><% end %>
+    <% if podcast.author %><itunes:author><%= podcast.author %></itunes:author><% end %>
+    <% if podcast.summary %><itunes:summary><%= podcast.summary %></itunes:summary><% end %>
+    <% if podcast.description %><description><%= podcast.description %></description><% end %>
+
+    <% if podcast.author%>
+    <itunes:owner>
+      <itunes:name>John Doe</itunes:name>
+      <itunes:email>john.doe@example.com</itunes:email>
+    </itunes:owner>
+    <% end %>
+    <% if podcast.image %><itunes:image href="<%= podcast.image %>" /><% end %>
+    <% if podcast.categories %>
+    <itunes:category text="Technology">
+      <itunes:category text="Gadgets"/>
+    </itunes:category>
+    <itunes:category text="TV &amp; Film"/>
+    <% end %>
+
+    <% podcast.items.each do |item| %>
+    <item>
+      <title><%= item.title %></title>
+      <itunes:author><%= item.author %></itunes:author>
+      <itunes:subtitle><%= item.subtitle %></itunes:subtitle>
+      <itunes:summary><%= item.summary %></itunes:summary>
+      <enclosure url="<%= item.enclosure_url %>" length="<%= item.enclosure_length %>" type="<%= item.enclosure_type %>" />
+      <% if item.guid %><guid><%= item.guid %></guid><% end %>
+      <pubDate><%= item.published_at %></pubDate>
+      <itunes:duration><%= item.duration %></itunes:duration>
+      <itunes:keywords><%= item.keywords.join(", ") %></itunes:keywords>
+    </item>
+    <% end %>
+    
+  </channel>
+</rss>

@@ -2,6 +2,7 @@
 require 'pp'
 require 'pit'
 require 'module/nicovideo/lib/nicovideo'
+require 'erb'
 
 module NicoPodcast
   def self.output_path
@@ -36,14 +37,14 @@ module NicoPodcast
   end
 
   class Podcast
-    attr_accessor :items
+    attr_accessor :items, :title
     def initialize(rule)
       @items = []
     end
 
     def process
       prepare_items
-#      publish
+      publish
     end
 
     def prepare_items
@@ -57,7 +58,49 @@ module NicoPodcast
     end
 
     def publish
-      # generate feed
+      podcast = self
+      template = open('template.xml')
+      ERB.new(template.read).result(binding)
+    end
+
+    def title
+      'title'
+    end
+
+    def link
+      'link'
+    end
+
+    def language
+      'ja-jp'
+    end
+
+    def copyright
+      'copyright'
+    end
+
+    def subtitle
+      'subtitle'
+    end
+
+    def author
+      'author'
+    end
+
+    def summary
+      'summary'
+    end
+
+    def description
+      'description'
+    end
+
+    def image
+      'image'
+    end
+
+    def categories
+      []
     end
   end
 
@@ -107,23 +150,56 @@ module NicoPodcast
     def inspect
       "\#<Video:#{@video.video_id} #{@video.title}>"
     end
-  end
 
-  module Encoder
-    def self.to_audio
+    def author
+      'author'
     end
 
-    def self.to_video
+    def subtitle
+      'subtitle'
+    end
+
+    def summary
+      'summary'
+    end
+
+    def enclosure_url
+      'enclosure_url'
+    end
+
+    def enclosure_length
+      'enclosure_length'
+    end
+
+    def enclosure_type
+      'enclosure_type'
+    end
+
+    def guid
+      'guid'
+    end
+
+    def published_at
+      'published_at'
+    end
+
+    def duration
+      'duration'
+    end
+
+    def keywords
+      []
     end
   end
+
 end
 
 
 # ----------------------
 
 podcast = NicoPodcast::Podcast.new(nil)
-podcast.items = NicoPodcast.agent.search('capsule').videos[0..0].map{ |vp|
+podcast.items = NicoPodcast.agent.search('capsule').videos.map{ |vp|
   NicoPodcast::Video.new(vp)
 }
-pp podcast.items
-podcast.process
+# pp podcast.items
+puts podcast.publish
