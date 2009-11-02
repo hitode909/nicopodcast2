@@ -25,6 +25,7 @@
     <itunes:category text="TV &amp; Film"/>
     <% end %>
 
+    <% if podcast.items %>
     <% podcast.items.each do |item| %>
     <item>
       <title><%= item.title %></title>
@@ -38,6 +39,6 @@
       <itunes:keywords><%= item.keywords.join(", ") %></itunes:keywords>
     </item>
     <% end %>
-    
+    <% end %>
   </channel>
 </rss>

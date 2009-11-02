@@ -37,11 +37,14 @@ module NicoPodcast
   end
 
   class Podcast
-    attr_accessor :items, :title
-    def initialize(rule)
+    attr_accessor :items, :title, :link, :language, :copyright, :subtitle, :author, :summary, :description, :image, :categories
+
+    def initialize
       @items = []
     end
+  end
 
+  class NicoPodcast <Podcast
     def process
       prepare_items
       publish
@@ -63,50 +66,31 @@ module NicoPodcast
       ERB.new(template.read).result(binding)
     end
 
-    def title
-      'title'
-    end
-
-    def link
-      'link'
-    end
-
     def language
       'ja-jp'
     end
 
-    def copyright
-      'copyright'
-    end
-
-    def subtitle
-      'subtitle'
-    end
-
-    def author
-      'author'
-    end
-
-    def summary
-      'summary'
-    end
-
-    def description
-      'description'
-    end
-
     def image
-      'image'
-    end
-
-    def categories
-      []
+      self.items.first.thumbnail
     end
   end
 
-  class Video
+  class Item
+    attr_accessor :title, :author, :subtitlel, :summary, :enclosure_url, :enclosure_length, :enclosure_type, :guid, :published_at, :duration, :keywords
+
+    def initialize
+      @keywords = []
+    end
+
+    def guid
+      self.enclosure_url
+    end
+  end
+
+  class Video < Item
     attr_reader :video
     def initialize(vp)
+      @keywords = []
       @video = vp
     end
 
@@ -143,24 +127,24 @@ module NicoPodcast
       File.join(NicoPodcast.file_path, @video.video_id + suffix)
     end
 
-    def title
-      @video.title
+    def info
+      @video.info
     end
 
     def inspect
       "\#<Video:#{@video.video_id} #{@video.title}>"
     end
 
+    def title
+      @video.title
+    end
+
     def author
       'author'
     end
 
-    def subtitle
-      'subtitle'
-    end
-
     def summary
-      'summary'
+      @video.info.description
     end
 
     def enclosure_url
@@ -168,27 +152,30 @@ module NicoPodcast
     end
 
     def enclosure_length
-      'enclosure_length'
+      @video.info.size_high
     end
 
     def enclosure_type
       'enclosure_type'
     end
 
-    def guid
-      'guid'
-    end
-
     def published_at
-      'published_at'
+      @video.info.published_at
     end
 
     def duration
-      'duration'
+      @video.info.length
     end
 
-    def keywords
-      []
+    def thumbnail
+      @video.info.thumbnail_url
+    end
+
+    def subtitle
+    end
+
+    def published_at
+      @video.info.first_retrieve
     end
   end
 
@@ -197,9 +184,15 @@ end
 
 # ----------------------
 
-podcast = NicoPodcast::Podcast.new(nil)
-podcast.items = NicoPodcast.agent.search('capsule').videos.map{ |vp|
-  NicoPodcast::Video.new(vp)
+podcast = NicoPodcast::NicoPodcast.new
+NicoPodcast.agent.search('capsule').videos.map{ |vp|
+  begin
+    i = NicoPodcast::Video.new(vp)
+    i.info
+    podcast.items << i
+  rescue => e
+    p e
+    puts "skip #{i}"
+  end
 }
-# pp podcast.items
 puts podcast.publish
