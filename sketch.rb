@@ -19,6 +19,14 @@ module NicoPodcast
     @@file_directory = a
   end
 
+  def self.root_url
+    @@root_url
+  end
+
+  def self.root_url=(a)
+    @@root_url = a
+  end
+
   def self.file_path
     File.join(self.output_path, self.file_directory)
   end
@@ -147,8 +155,8 @@ module NicoPodcast
       @video.info.description
     end
 
-    def enclosure_url
-      'enclosure_url'
+    def enclosure_url(type = 'mp3')
+      File.join(NicoPodcast.root_url, NicoPodcast.file_directory, @video.video_id + suffix)
     end
 
     def enclosure_length
@@ -164,7 +172,7 @@ module NicoPodcast
     end
 
     def duration
-      @video.info.length
+      @video.info['length']
     end
 
     def thumbnail
@@ -184,15 +192,19 @@ end
 
 # ----------------------
 
+NicoPodcast.root_url = 'http://exampple.com/podcast/'
 podcast = NicoPodcast::NicoPodcast.new
-NicoPodcast.agent.search('capsule').videos.map{ |vp|
+key = 'capsule'
+search = NicoPodcast.agent.search(key)
+podcast.title = key
+podcast.description = "#{key}の検索結果"
+podcast.link = search.url
+search.videos.map{ |vp|
   begin
     i = NicoPodcast::Video.new(vp)
     i.info
     podcast.items << i
-  rescue => e
-    p e
-    puts "skip #{i}"
+  rescue
   end
 }
-puts podcast.publish
+puts podcast.process

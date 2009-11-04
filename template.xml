@@ -36,7 +36,7 @@
       <% if item.guid %><guid><%= item.guid %></guid><% end %>
       <pubDate><%= item.published_at %></pubDate>
       <itunes:duration><%= item.duration %></itunes:duration>
-      <itunes:keywords><%= item.keywords.join(", ") %></itunes:keywords>
+      <% if item.keywords and item.keywords.length > 0 %><itunes:keywords><%= item.keywords.join(", ") %></itunes:keywords><% end %>
     </item>
     <% end %>
     <% end %>
