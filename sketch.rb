@@ -195,8 +195,12 @@ module NicoPodcast
       File.join(NicoPodcast.root_url, NicoPodcast.file_directory, @video.video_id + suffix)
     end
 
+    def enclosure_path(type = NicoPodcast.output_type)
+      self.path(type)
+    end
+
     def enclosure_length
-      File.size(self.path) rescue 0
+      File.size(self.enclosure_path) rescue 0
     end
 
     def enclosure_type
