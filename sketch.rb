@@ -159,10 +159,14 @@ module NicoPodcast
     end
 
     def encode
-      puts "encode #{self.inspect} mp3"
-      (system "ffmpeg -i #{self.original_path} -acodec libmp3lame -ab 128k #{self.path('mp3')} >& /dev/null" or File.unlink(self.path('mp3'))) unless File.exist?(self.path('mp3'))
-      puts "encode #{self.inspect} mp4"
-      (system "ffmpeg -i #{self.original_path} -f mp4 -acodec libfaac -vcodec libx264 -vpre ipod320 #{self.path('mp4')} >& /dev/null" or File.unlink(self.path('mp4'))) unless File.exist?(self.path('mp4'))
+      if NicoPodcast.output_type == 'mp3'
+        puts "encode #{self.inspect} mp3"
+        (system "ffmpeg -i #{self.original_path} -acodec libmp3lame -ab 128k -ac 2 #{self.path('mp3')} > /dev/null" ) unless File.exist?(self.path('mp3'))
+      end
+      if NicoPodcast.output_type == 'mp4'
+        puts "encode #{self.inspect} mp4"
+        (system "ffmpeg -i #{self.original_path} -f mp4 -acodec libfaac -ac 2 -vcodec libx264 -vpre default #{self.path('mp4')} > /dev/null" or File.unlink(self.path('mp4'))) unless File.exist?(self.path('mp4'))
+      end
     end
 
     def path(type = @video.type)
