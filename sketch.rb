@@ -114,7 +114,10 @@ module NicoPodcast
     end
 
     def image
-      self.items.first.thumbnail
+      self.items.each{ |i|
+        return i.thumbnail rescue next
+      }
+      ""
     end
   end
 
@@ -143,7 +146,7 @@ module NicoPodcast
     end
 
     def has_source?
-      File.exist?(self.path)
+      File.exist?(self.original_path)
     end
 
     def has_enclosure?
@@ -153,20 +156,25 @@ module NicoPodcast
     def download
       puts "download #{self.title} (#{@video.info.size_high / 1024}kb)"
       NicoPodcast.prepare_directory
-      File.open(self.path, "wb") {|f|
+      File.open(self.original_path, "wb") {|f|
         f.write @video.video
       }
     end
 
     def encode
       puts "encode #{self.title} mp3"
-      (system "ffmpeg -i #{self.path} -acodec libmp3lame -ab 128k #{self.path('mp3')} >& /dev/null" or File.unlink(self.path('mp3'))) unless File.exist?(self.path('mp3'))
+      (system "ffmpeg -i #{self.original_path} -acodec libmp3lame -ab 128k #{self.path('mp3')} >& /dev/null" or File.unlink(self.path('mp3'))) unless File.exist?(self.path('mp3'))
       puts "encode #{self.title}"
-      (system "ffmpeg -i #{self.path} -f mp4 -acodec libfaac -async 4800 -dts_delta_threshold 1 -vcodec libx264 -qscale 7 #{self.path('mp4')} >& /dev/null" or File.unlink(self.path('mp4'))) unless File.exist?(self.path('mp4'))
+      (system "ffmpeg -i #{self.original_path} -f mp4 -acodec libfaac -async 4800 -dts_delta_threshold 1 -vcodec libx264 -qscale 7 #{self.path('mp4')} >& /dev/null" or File.unlink(self.path('mp4'))) unless File.exist?(self.path('mp4'))
     end
 
     def path(type = @video.type)
       suffix = type ? ".#{type}" : ''
+      File.join(NicoPodcast.file_path, @video.video_id + suffix)
+    end
+
+    def original_path
+      suffix = "_original.#{@video.type}"
       File.join(NicoPodcast.file_path, @video.video_id + suffix)
     end
 
@@ -238,7 +246,7 @@ podcast = NicoPodcast::Podcast::Search.new
 key = 'PV'
 search = NicoPodcast.agent.search(key)
 podcast.link = search.url
-search.videos[0..5].map{ |vp|
+search.videos[1..3].map{ |vp|
   begin
     i = NicoPodcast::Video.new(vp)
     i.info
