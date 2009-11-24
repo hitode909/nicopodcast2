@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
-require 'pp'
 require 'pit'
 require 'module/nicovideo/lib/nicovideo'
-require 'erb'
-require 'thread'
 require 'nkf'
 
 module NicoPodcast
