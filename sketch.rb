@@ -5,7 +5,7 @@ require "rss/maker"
 
 module NicoPodcast
   def self.output_path
-    @@output_path ||= './podcast'
+    @@output_path ||= File.expand_path('~/public_html/podcast')
   end
   def self.output_path=(a)
     @@output_path = File.expand_path(a)
@@ -26,7 +26,7 @@ module NicoPodcast
   end
 
   def self.root_url
-    @@root_url
+    @@root_url ||= "http://#{`hostname`.chomp}/~#{ENV['USER']}/podcast/"
   end
 
   def self.root_url=(a)
