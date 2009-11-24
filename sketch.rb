@@ -188,7 +188,7 @@ module NicoPodcast
     end
 
     def title
-      NKF.nkf('-w', @video.title)
+      self.info.title
     end
 
     def author
