@@ -183,7 +183,7 @@ module NicoPodcast
     end
 
     def inspect
-      "\#<Video:#{@video.video_id}>"
+      "\#<Video:#{@video.video_id} #{self.title}>"
     end
 
     def title
@@ -242,6 +242,7 @@ end
 
 podcast = NicoPodcast::Podcast::Search.new
 key = ARGV.shift
+puts "searching #{key}"
 search = NicoPodcast.agent.search(key)
 podcast.link = search.url
 search.videos.map{ |vp|
@@ -254,6 +255,7 @@ search.videos.map{ |vp|
 }
 
 type = ARGV.shift
+puts "type: #{type}"
 (type ? [type] : ['mp3', 'mp4']).each{ |type|
   NicoPodcast.output_type = type
   podcast.title = "#{key}(#{type})"
