@@ -150,7 +150,7 @@ module NicoPodcast
     end
 
     def download
-      puts "download #{self.title} (#{@video.info.size_high / 1024}kb)"
+      puts "download #{self.video_id} (#{@video.info.size_high / 1024}kb)"
       NicoPodcast.prepare_directory
       File.open(self.original_path, "wb") {|f|
         f.write @video.video
@@ -158,9 +158,9 @@ module NicoPodcast
     end
 
     def encode
-      puts "encode #{self.title} mp3"
+      puts "encode #{self.video_id} mp3"
       (system "ffmpeg -i #{self.original_path} -acodec libmp3lame -ab 128k #{self.path('mp3')} >& /dev/null" or File.unlink(self.path('mp3'))) unless File.exist?(self.path('mp3'))
-      puts "encode #{self.title}"
+      puts "encode #{self.video_id}"
       (system "ffmpeg -i #{self.original_path} -f mp4 -acodec libfaac -async 4800 -dts_delta_threshold 1 -vcodec libx264 -qscale 7 #{self.path('mp4')} >& /dev/null" or File.unlink(self.path('mp4'))) unless File.exist?(self.path('mp4'))
     end
 
@@ -179,7 +179,7 @@ module NicoPodcast
     end
 
     def inspect
-      "\#<Video:#{@video.video_id} #{@video.title}>"
+      "\#<Video:#{@video.video_id} #{@video.video_id}>"
     end
 
     def title
