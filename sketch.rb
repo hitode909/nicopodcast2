@@ -93,8 +93,9 @@ module NicoPodcast
             item.description = source.info.description
             item.date = source.info.first_retrieve
             item.itunes_duration = source.duration
-            item.enclosure = RSS::Rss::Channel::Item::Enclosure.new(
-            source.enclosure_url, source.enclosure_length, source.enclosure_type )
+            item.enclosure.url = source.enclosure_url
+            item.enclosure.length = source.enclosure_length
+            item.enclosure.type = source.enclosure_type
           end
         end
       end
