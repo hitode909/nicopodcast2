@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 require 'pit'
 require 'module/nicovideo/lib/nicovideo'
-require 'nkf'
 require "rss/maker"
 
 module NicoPodcast
