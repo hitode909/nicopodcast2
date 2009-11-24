@@ -233,8 +233,6 @@ NicoPodcast.output_path = '~/Sites/podcast'
 podcast = NicoPodcast::Podcast::Search.new
 key = 'PV'
 search = NicoPodcast.agent.search(key)
-podcast.title = key
-podcast.description = "#{key}の検索結果"
 podcast.link = search.url
 search.videos[0..5].map{ |vp|
   begin
@@ -244,6 +242,11 @@ search.videos[0..5].map{ |vp|
   rescue
   end
 }
-File.open(File.join(NicoPodcast.output_path, "#{podcast.title}.rss"), "w") {|f|
-  f.puts podcast.process
+['mp3', 'mp4'].each{ |type|
+  NicoPodcast.output_type = type
+  podcast.title = "#{key}(#{type})"
+  podcast.description = "#{key}の検索結果(#{type})"
+  File.open(File.join(NicoPodcast.output_path, "#{key}_#{type}.rss"), "w") {|f|
+    f.puts podcast.process
+  }
 }
