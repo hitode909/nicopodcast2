@@ -238,13 +238,13 @@ end
 
 # ----------------------
 
-NicoPodcast.root_url = 'http://localhost/~fkd/podcast/'
+NicoPodcast.root_url = "http://localhost/~#{ENV['USER']}/podcast/"
 NicoPodcast.output_path = '~/Sites/podcast'
 podcast = NicoPodcast::Podcast::Search.new
 key = 'PV'
 search = NicoPodcast.agent.search(key)
 podcast.link = search.url
-search.videos[1..3].map{ |vp|
+search.videos.map{ |vp|
   begin
     i = NicoPodcast::Video.new(vp)
     i.info
