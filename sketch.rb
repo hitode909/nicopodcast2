@@ -4,6 +4,7 @@ require 'pit'
 require 'module/nicovideo/lib/nicovideo'
 require 'erb'
 require 'thread'
+require 'nkf'
 
 module NicoPodcast
   def self.output_path
