@@ -240,10 +240,8 @@ end
 
 # ----------------------
 
-NicoPodcast.root_url = "http://localhost/~#{ENV['USER']}/podcast/"
-NicoPodcast.output_path = '~/Sites/podcast'
 podcast = NicoPodcast::Podcast::Search.new
-key = 'PV'
+key = ARGV.shift
 search = NicoPodcast.agent.search(key)
 podcast.link = search.url
 search.videos.map{ |vp|
@@ -254,11 +252,14 @@ search.videos.map{ |vp|
   rescue
   end
 }
-['mp3', 'mp4'].each{ |type|
+
+type = ARGV.shift
+(type ? [type] : ['mp3', 'mp4']).each{ |type|
   NicoPodcast.output_type = type
   podcast.title = "#{key}(#{type})"
   podcast.description = "#{key}の検索結果(#{type})"
+  rss = podcast.process
   File.open(File.join(NicoPodcast.output_path, "#{key}_#{type}.rss"), "w") {|f|
-    f.puts podcast.process
+    f.puts rss
   }
 }
