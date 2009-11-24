@@ -2,6 +2,7 @@
 require 'pit'
 require 'module/nicovideo/lib/nicovideo'
 require 'nkf'
+require "rss/maker"
 
 module NicoPodcast
   def self.output_path
@@ -78,29 +79,26 @@ module NicoPodcast
     end
 
     def publish
-      rss = RSS::Rss.new( "0.9" )
-      channel = RSS::Rss::Channel.new
-      channel.title = self.title
-      channel.description = self.description
-      channel.link = self.link
-      channel.language = self.language
-      rss.channel = channel
-
-      image = RSS::Rss::Channel::Image.new
-      image.url = self.image
-      image.title = self.title
-      image.link = self.link
-      channel.image = image
-
-      self.items.each do |source|
-        item = RSS::Rss::Channel::Item.new
-        item.title = source.title
-        item.link = source.info.watch_url
-        item.enclosure = RSS::Rss::Channel::Item::Enclosure.new(
-          source.enclosure_url, source.enclosure_length, source.enclosure_type )
-        channel.items << item
+      rss = RSS::Maker.make('2.0') do |maker|
+        maker.channel.title = self.title
+        maker.channel.description = self.description
+        maker.channel.link = self.link
+        maker.channel.itunes_image = self.image
+        maker.channel.language = self.language
+        maker.items.do_sort = true
+        self.items.each do |source|
+          maker.items.new_item do |item|
+            item.link = source.info.watch_url
+            item.title = source.title
+            item.description = source.info.description
+            item.date = source.info.first_retrieve
+            item.itunes_duration = source.duration
+            item.enclosure = RSS::Rss::Channel::Item::Enclosure.new(
+            source.enclosure_url, source.enclosure_length, source.enclosure_type )
+          end
+        end
       end
-      puts rss.to_s
+
       return rss.to_s
     end
 
