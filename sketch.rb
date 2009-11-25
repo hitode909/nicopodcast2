@@ -5,7 +5,7 @@ require "rss/maker"
 
 module NicoPodcast
   def self.output_path
-    @@output_path ||= File.expand_path('~/public_html/podcast')
+    @@output_path ||= File.expand_path('~/public_html/podcast/')
   end
   def self.output_path=(a)
     @@output_path = File.expand_path(a)
@@ -158,13 +158,13 @@ module NicoPodcast
     end
 
     def encode
-      if NicoPodcast.output_type == 'mp3'
+      if NicoPodcast.output_type == 'mp3' and not File.exist?(self.path('mp3'))
         puts "encode #{self.inspect} mp3"
-        (system "ffmpeg -i #{self.original_path} -acodec libmp3lame -ab 128k -ac 2 #{self.path('mp3')} > /dev/null" ) unless File.exist?(self.path('mp3'))
+        system "ffmpeg -i #{self.original_path} -acodec libmp3lame -ab 128k -ac 2 #{self.path('mp3')} > /dev/null" or File.unlink(self.path('mp3'))
       end
-      if NicoPodcast.output_type == 'mp4'
+      if NicoPodcast.output_type == 'mp4' and not File.exist?(self.path('mp4'))
         puts "encode #{self.inspect} mp4"
-        (system "ffmpeg -i #{self.original_path} -f mp4 -acodec libfaac -ac 2 -vcodec libx264 -vpre default #{self.path('mp4')} > /dev/null" or File.unlink(self.path('mp4'))) unless File.exist?(self.path('mp4'))
+        system "ffmpeg -i #{self.original_path} -f mp4 -acodec libfaac -ac 2 -vcodec libx264 -vpre default #{self.path('mp4')} > /dev/null" or File.unlink(self.path('mp4'))
       end
     end
 
@@ -239,6 +239,8 @@ end
 
 
 # ----------------------
+puts NicoPodcast.output_path
+puts NicoPodcast.root_url
 
 podcast = NicoPodcast::Podcast::Search.new
 key = ARGV.shift
@@ -248,7 +250,6 @@ podcast.link = search.url
 search.videos.map{ |vp|
   begin
     i = NicoPodcast::Video.new(vp)
-    i.info
     podcast.items << i
   rescue
   end
