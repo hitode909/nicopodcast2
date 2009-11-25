@@ -164,7 +164,7 @@ module NicoPodcast
       end
       if NicoPodcast.output_type == 'mp4' and not File.exist?(self.path('mp4'))
         puts "encode #{self.inspect} mp4"
-        system "ffmpeg -i #{self.original_path} -f mp4 -acodec libfaac -ac 2 -vcodec libx264 -vpre default #{self.path('mp4')} > /dev/null" or File.unlink(self.path('mp4'))
+        system "ffmpeg -i #{self.original_path} -vcodec mpeg4 -ac 2 #{self.path('mp4')} > /dev/null" or File.unlink(self.path('mp4'))
       end
     end
 
