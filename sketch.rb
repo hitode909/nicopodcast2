@@ -91,7 +91,7 @@ module NicoPodcast
             item.title = source.title
             item.description = source.info.description
             item.date = source.info.first_retrieve
-            item.itunes_duration = source.duration
+            item.itunes_duration = (Time.gm(2000) + source.duration.split(":").inject(0){|a,b|a*60+b.to_i}).strftime("%H:%M:%S").gsub(/^(0|:)*/, '')
             item.enclosure.url = source.enclosure_url
             item.enclosure.length = source.enclosure_length
             item.enclosure.type = source.enclosure_type
