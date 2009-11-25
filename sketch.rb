@@ -183,7 +183,7 @@ module NicoPodcast
     end
 
     def inspect
-      "\#<Video:#{@video.video_id} #{self.title}>"
+      "\#<Video:#{@video.video_id} #{self.title} #{self.duration}>"
     end
 
     def title
