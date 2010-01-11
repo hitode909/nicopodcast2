@@ -1,3 +1,6 @@
 [submodule "module/nicovideo"]
 	path = module/nicovideo
 	url = git://github.com/hitode909/ruby-nicovideo.git
+[submodule "modules/nicovideo"]
+	path = modules/nicovideo
+	url = git://github.com/emergent/ruby-nicovideo.git

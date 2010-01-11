@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 require 'pit'
-require 'module/nicovideo/lib/nicovideo'
+require 'modules/nicovideo/lib/nicovideo'
 require "rss/maker"
 
 module NicoPodcast
@@ -66,13 +66,13 @@ module NicoPodcast
 
     def prepare_items
       @items = @items.map{ |item|
-        begin
+       begin
           item.prepare
           item
-        rescue => e
-          p e
-          nil
-        end
+       rescue => e
+         p e
+         nil
+       end
       }.compact
       return
     end
@@ -137,8 +137,9 @@ module NicoPodcast
     end
 
     def prepare
+      return if has_enclosure?
       download unless has_source?
-      encode unless has_enclosure?
+      encode
     end
 
     def has_source?
@@ -174,7 +175,8 @@ module NicoPodcast
     end
 
     def original_path
-      suffix = "_original.#{@video.type}"
+      type = @video.type rescue 'tmp'
+      suffix = "_original.#{type}"
       File.join(NicoPodcast.file_path, @video.video_id + suffix)
     end
 
@@ -246,12 +248,17 @@ podcast = NicoPodcast::Podcast::Search.new
 key = ARGV.shift
 puts "searching #{key}"
 search = NicoPodcast.agent.search(key)
+pp search.videos
 podcast.link = search.url
 search.videos.map{ |vp|
   begin
     i = NicoPodcast::Video.new(vp)
+    p i.video.info.title
+    p i.video.title
     podcast.items << i
-  rescue
+  rescue => e
+    p "skip #{i}"
+    p e
   end
 }
 
